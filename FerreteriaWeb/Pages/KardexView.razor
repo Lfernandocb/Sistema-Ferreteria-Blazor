@@ -1,0 +1,71 @@
+﻿@page "/kardex"
+@using FerreteriaWeb.Data
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Context
+
+<h3 class="mb-4">📦 Kardex - Historial de Movimientos</h3>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-warning">
+        @error
+    </div>
+}
+else if (movimientos == null)
+{
+    <p>Cargando movimientos...</p>
+}
+else if (movimientos.Count == 0)
+{
+    <div class="alert alert-info">
+        No hay movimientos registrados en Kardex.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Producto ID</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+                <th>Saldo Posterior</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var k in movimientos)
+            {
+                <tr>
+                    <td>@k.id_kardex</td>
+                    <td>@k.producto_id</td>
+                    <td>@k.tipo_movimiento</td>
+                    <td>@k.cantidad</td>
+                    <td>@k.saldo_post_mov</td>
+                    <td>@k.fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Kardex>? movimientos;
+    private string error = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            movimientos = await Context.Kardex
+                .OrderByDescending(k => k.fecha)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            error = "Error al cargar Kardex: " + ex.Message;
+            movimientos = new List<Kardex>();
+        }
+    }
+}

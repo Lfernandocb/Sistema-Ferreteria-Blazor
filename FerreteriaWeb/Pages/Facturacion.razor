@@ -1,0 +1,281 @@
+﻿@page "/facturacion"
+@using FerreteriaWeb.Data
+@using Microsoft.EntityFrameworkCore
+
+@inject ProductoService ProductoService
+@inject FacturaService FacturaService
+@inject AuthService AuthService
+@inject AppDbContext Context
+
+<h3 class="mb-4">💳 Nueva Venta</h3>
+
+<div class="alert alert-success">
+    Sistema de facturación activo
+</div>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info">
+        @mensaje
+    </div>
+}
+
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white">
+        Datos de la factura
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-4">
+                <label>Nombre del cliente</label>
+                <input class="form-control"
+                       @bind="nombreCliente"
+                       placeholder="Consumidor Final" />
+            </div>
+
+            <div class="col-md-4">
+                <label>RUC / Cédula</label>
+                <input class="form-control"
+                       @bind="rucCedula"
+                       placeholder="000-000000-0000X" />
+            </div>
+
+            <div class="col-md-3">
+                <label>Tipo de venta</label>
+                <select class="form-control" @bind="tipoVenta">
+                    <option value="CONTADO">CONTADO</option>
+                    <option value="CREDITO">CRÉDITO</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        Agregar producto a la venta
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-5">
+                <label>Producto</label>
+                <select class="form-control" @bind="productoSeleccionadoId">
+                    <option value="0">-- Seleccione producto --</option>
+
+                    @foreach (var p in productos)
+                    {
+                        <option value="@p.id_producto">
+                            @p.nombre - Stock: @p.stock_real - @("NIO " + Convert.ToDecimal(p.precio_venta).ToString("0.00"))
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Cantidad</label>
+                <input type="number"
+                       class="form-control"
+                       @bind="cantidad"
+                       min="1" />
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-success w-100"
+                        @onclick="AgregarProducto">
+                    + Agregar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@if (detalles.Count > 0)
+{
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var d in detalles)
+            {
+                <tr>
+                    <td>@d.Producto?.nombre</td>
+                    <td>@d.cantidad</td>
+                    <td>@("NIO " + Convert.ToDecimal(d.precio_unitario).ToString("0.00"))</td>
+                    <td>@("NIO " + Convert.ToDecimal(d.subtotal).ToString("0.00"))</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm"
+                                @onclick="() => QuitarProducto(d)">
+                            Quitar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end">
+        <h5>Subtotal: @("NIO " + Convert.ToDecimal(Subtotal).ToString("0.00"))</h5>
+        <h5>IVA (15%): @("NIO " + Convert.ToDecimal(IVA).ToString("0.00"))</h5>
+
+        <h3 class="fw-bold text-success">
+            TOTAL: @("NIO " + Convert.ToDecimal(Total).ToString("0.00"))
+        </h3>
+
+        <button class="btn btn-primary btn-lg mt-2"
+                @onclick="GuardarVenta">
+            Guardar Venta
+        </button>
+    </div>
+}
+
+@code {
+    private List<Producto> productos = new();
+    private List<FacturaDetalle> detalles = new();
+
+    private int productoSeleccionadoId = 0;
+    private decimal cantidad = 1;
+
+    private string nombreCliente = "";
+    private string rucCedula = "";
+    private string tipoVenta = "CONTADO";
+    private string mensaje = "";
+
+    private decimal Subtotal => detalles.Sum(d => d.subtotal);
+    private decimal IVA => Subtotal * 0.15m;
+    private decimal Total => Subtotal + IVA;
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await ProductoService.GetProductosAsync();
+    }
+
+    private void AgregarProducto()
+    {
+        mensaje = "";
+
+        if (productoSeleccionadoId == 0)
+        {
+            mensaje = "Debe seleccionar un producto.";
+            return;
+        }
+
+        if (cantidad <= 0)
+        {
+            mensaje = "La cantidad debe ser mayor que cero.";
+            return;
+        }
+
+        var producto = productos.FirstOrDefault(p => p.id_producto == productoSeleccionadoId);
+
+        if (producto == null)
+        {
+            mensaje = "Producto no encontrado.";
+            return;
+        }
+
+        if (producto.stock_real < cantidad)
+        {
+            mensaje = "Stock insuficiente.";
+            return;
+        }
+
+        detalles.Add(new FacturaDetalle
+        {
+            producto_id = producto.id_producto,
+            cantidad = cantidad,
+            precio_unitario = producto.precio_venta,
+            Producto = producto
+        });
+
+        productoSeleccionadoId = 0;
+        cantidad = 1;
+    }
+
+    private void QuitarProducto(FacturaDetalle detalle)
+    {
+        detalles.Remove(detalle);
+    }
+
+    private async Task<int> ObtenerOCrearCliente()
+    {
+        var nombre = string.IsNullOrWhiteSpace(nombreCliente)
+            ? "Consumidor Final"
+            : nombreCliente.Trim();
+
+        var ruc = string.IsNullOrWhiteSpace(rucCedula)
+            ? "N/A"
+            : rucCedula.Trim();
+
+        var clienteExistente = await Context.Clientes
+            .FirstOrDefaultAsync(c => c.nombre_cliente == nombre && c.ruc_cedula == ruc);
+
+        if (clienteExistente != null)
+            return clienteExistente.id_cliente;
+
+        var nuevoCliente = new Cliente
+        {
+            nombre_cliente = nombre,
+            ruc_cedula = ruc,
+            es_mayorista = false
+        };
+
+        Context.Clientes.Add(nuevoCliente);
+        await Context.SaveChangesAsync();
+
+        return nuevoCliente.id_cliente;
+    }
+
+    private async Task GuardarVenta()
+    {
+        mensaje = "";
+
+        if (detalles.Count == 0)
+        {
+            mensaje = "Debe agregar al menos un producto.";
+            return;
+        }
+
+        var clienteId = await ObtenerOCrearCliente();
+        var usuario = AuthService.UsuarioActual;
+
+        var factura = new Factura
+        {
+            cliente_id = clienteId,
+            usuario_id = usuario?.id_usuario ?? 1,
+            tipo_venta = tipoVenta,
+            total = Total
+        };
+
+        var exito = await FacturaService.CrearFacturaAsync(factura, detalles);
+
+        if (exito)
+        {
+            mensaje = "Venta guardada correctamente.";
+
+            detalles.Clear();
+            nombreCliente = "";
+            rucCedula = "";
+            tipoVenta = "CONTADO";
+
+            productos = await ProductoService.GetProductosAsync();
+        }
+        else
+        {
+            mensaje = "Error: " + FacturaService.UltimoError;
+        }
+    }
+}

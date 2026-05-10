@@ -1,0 +1,125 @@
+﻿@using FerreteriaWeb.Data
+@inject AuthService AuthService
+@inject NavigationManager Nav
+@implements IDisposable
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Sistema Ferretero</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @if (AuthService.UsuarioActual == null)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="login" Match="NavLinkMatch.All">
+                    <span class="oi oi-account-login" aria-hidden="true"></span> Acceso al Sistema
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            @* ENCABEZADO DE USUARIO *@
+            <div class="nav-item px-3 text-white-50 mb-3 text-center border-bottom border-secondary">
+                <small>
+                    Usuario: <strong>@AuthService.UsuarioActual.nombre_login</strong> <br />
+                    (@(AuthService.UsuarioActual.rol?.ToUpper() == "VENDEDOR" ? "Agente de Ventas" :
+                                    AuthService.UsuarioActual.rol?.ToUpper() == "CAJERO" ? "Gestor de Inventario" : "Administrador"))
+            </small>
+        </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> Inicio
+                </NavLink>
+            </div>
+
+            @* SECCIÓN DE INVENTARIO: ADMIN Y CAJERO *@
+        @if (AuthService.UsuarioActual.rol?.ToUpper() == "ADMINISTRADOR" || AuthService.UsuarioActual.rol?.ToUpper() == "CAJERO")
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="inventario" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-box" aria-hidden="true"></span> Productos
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="kardex" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-list" aria-hidden="true"></span> Kardex (Stock)
+                    </NavLink>
+                </div>
+            }
+
+            @* SECCIÓN DE VENTAS Y CAJA: ADMIN Y VENDEDOR *@
+            @if (AuthService.UsuarioActual.rol?.ToUpper() == "ADMINISTRADOR" || AuthService.UsuarioActual.rol?.ToUpper() == "VENDEDOR")
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="facturacion" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-credit-card" aria-hidden="true"></span> Facturación
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="clientes" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-people" aria-hidden="true"></span> Clientes y Crédito
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="caja" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-calculator" aria-hidden="true"></span> Control de Caja
+                    </NavLink>
+                </div>
+            }
+
+            @* SECCIÓN DE REPORTES: SOLO ADMIN *@
+            @if (AuthService.UsuarioActual.rol?.ToUpper() == "ADMINISTRADOR")
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="reportes" Match="NavLinkMatch.Prefix">
+                        <span class="oi oi-graph" aria-hidden="true"></span> Reportes de Ventas
+                    </NavLink>
+                </div>
+            }
+
+            <div class="nav-item px-3 mt-4">
+                <button class="nav-link btn btn-link text-danger w-100 text-start border-top border-secondary pt-3" @onclick="CerrarSesion">
+                    <span class="oi oi-power-standby" aria-hidden="true"></span> Cerrar Sesión
+                </button>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+
+    protected override void OnInitialized()
+    {
+        AuthService.OnChange += HandleOnChange;
+    }
+
+    private async void HandleOnChange()
+    {
+        // InvokeAsync asegura que la interfaz se actualice en el hilo correcto
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= HandleOnChange;
+    }
+
+    private void CerrarSesion()
+    {
+        AuthService.Logout();
+        // El true es vital para limpiar el estado de la aplicación al salir
+        Nav.NavigateTo("login", true);
+    }
+}

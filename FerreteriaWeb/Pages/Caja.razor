@@ -1,0 +1,282 @@
+﻿@page "/caja"
+@using FerreteriaWeb.Data
+@using Microsoft.EntityFrameworkCore
+@using CajaModel = FerreteriaWeb.Data.Caja
+
+@inject AuthService AuthService
+@inject AppDbContext Context
+
+<PageTitle>Control de Caja - Sistema Ferretero</PageTitle>
+
+<h3 class="mb-4">🧮 Gestión de Control de Caja</h3>
+
+@if (AuthService.UsuarioActual == null ||
+    (AuthService.UsuarioActual.rol != "ADMINISTRADOR" &&
+     AuthService.UsuarioActual.rol != "VENDEDOR"))
+{
+    <div class="alert alert-danger">
+        No tiene permisos para acceder a este módulo.
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-info">
+            @mensaje
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    Estado de Caja
+                </div>
+
+                <div class="card-body">
+                    <p><strong>Usuario:</strong> @AuthService.UsuarioActual.nombre_login</p>
+                    <p><strong>Fecha:</strong> @DateTime.Now.ToString("dd/MM/yyyy")</p>
+
+                    @if (cajaAbierta == null)
+                    {
+                        <div class="alert alert-warning">
+                            No hay caja abierta actualmente.
+                        </div>
+
+                        <label>Monto inicial</label>
+                        <input type="number"
+                               class="form-control mb-3"
+                               @bind="montoApertura" />
+
+                        <button class="btn btn-success w-100"
+                                @onclick="AbrirCaja">
+                            Abrir Caja
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success">
+                            Caja abierta desde:
+                            <br />
+                            <strong>@cajaAbierta.fecha_apertura?.ToString("dd/MM/yyyy HH:mm")</strong>
+                        </div>
+
+                        <p><strong>Monto apertura:</strong> NIO @cajaAbierta.monto_apertura.ToString("0.00")</p>
+                        <p><strong>Ventas registradas:</strong> NIO @ventasCaja.ToString("0.00")</p>
+                        <p><strong>Total esperado:</strong> NIO @TotalEsperado.ToString("0.00")</p>
+
+                        <label>Monto contado en caja</label>
+                        <input type="number"
+                               class="form-control mb-3"
+                               @bind="montoCierre" />
+
+                        <button class="btn btn-danger w-100"
+                                @onclick="CerrarCaja">
+                            Realizar Arqueo y Cierre
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    Ventas de la sesión actual
+                </div>
+
+                <div class="card-body">
+                    @if (ventasRecientes.Count == 0)
+                    {
+                        <div class="alert alert-info">
+                            No hay ventas registradas en esta sesión.
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID Venta</th>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var venta in ventasRecientes)
+                                {
+                                    <tr>
+                                        <td>@venta.id_factura</td>
+                                        <td>@venta.fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@venta.tipo_venta</td>
+                                        <td>NIO @venta.total.ToString("0.00")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    Historial de Cajas
+                </div>
+
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Apertura</th>
+                                <th>Cierre</th>
+                                <th>Monto Inicial</th>
+                                <th>Monto Cierre</th>
+                                <th>Diferencia</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var c in historialCajas)
+                            {
+                                <tr>
+                                    <td>@c.id_caja</td>
+                                    <td>@c.fecha_apertura?.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@c.fecha_cierre?.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>NIO @c.monto_apertura.ToString("0.00")</td>
+                                    <td>NIO @c.monto_cierre.ToString("0.00")</td>
+                                    <td>NIO @((c.diferencia ?? 0).ToString("0.00"))</td>
+                                    <td>
+                                        <span class="badge @(c.estado == "ABIERTA" ? "bg-success" : "bg-dark")">
+                                            @c.estado
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private CajaModel? cajaAbierta;
+    private List<CajaModel> historialCajas = new();
+    private List<Factura> ventasRecientes = new();
+
+    private decimal montoApertura = 0;
+    private decimal montoCierre = 0;
+    private decimal ventasCaja = 0;
+    private string mensaje = "";
+
+    private decimal TotalEsperado =>
+        (cajaAbierta?.monto_apertura ?? 0) + ventasCaja;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarDatos();
+    }
+
+    private async Task CargarDatos()
+    {
+        var usuarioId = AuthService.UsuarioActual?.id_usuario ?? 0;
+
+        cajaAbierta = await Context.Caja
+            .Where(c => c.usuario_id == usuarioId && c.estado == "ABIERTA")
+            .OrderByDescending(c => c.fecha_apertura)
+            .FirstOrDefaultAsync();
+
+        historialCajas = await Context.Caja
+            .OrderByDescending(c => c.id_caja)
+            .ToListAsync();
+
+        if (cajaAbierta != null)
+        {
+            ventasRecientes = await Context.Facturas
+                .Where(f => f.usuario_id == usuarioId &&
+                            f.fecha >= cajaAbierta.fecha_apertura)
+                .OrderByDescending(f => f.fecha)
+                .ToListAsync();
+
+            ventasCaja = ventasRecientes.Sum(v => v.total);
+            montoCierre = TotalEsperado;
+        }
+        else
+        {
+            ventasRecientes = new List<Factura>();
+            ventasCaja = 0;
+            montoCierre = 0;
+        }
+    }
+
+    private async Task AbrirCaja()
+    {
+        mensaje = "";
+
+        if (montoApertura < 0)
+        {
+            mensaje = "El monto inicial no puede ser negativo.";
+            return;
+        }
+
+        var usuarioId = AuthService.UsuarioActual?.id_usuario ?? 0;
+
+        var existeCajaAbierta = await Context.Caja
+            .AnyAsync(c => c.usuario_id == usuarioId && c.estado == "ABIERTA");
+
+        if (existeCajaAbierta)
+        {
+            mensaje = "Ya existe una caja abierta para este usuario.";
+            return;
+        }
+
+        var nuevaCaja = new CajaModel
+        {
+            usuario_id = usuarioId,
+            monto_apertura = montoApertura,
+            monto_cierre = 0,
+            estado = "ABIERTA",
+            fecha_apertura = DateTime.Now,
+            fecha_cierre = null,
+            diferencia = 0
+        };
+
+        Context.Caja.Add(nuevaCaja);
+        await Context.SaveChangesAsync();
+
+        mensaje = "Caja abierta correctamente.";
+        montoApertura = 0;
+
+        await CargarDatos();
+    }
+
+    private async Task CerrarCaja()
+    {
+        mensaje = "";
+
+        if (cajaAbierta == null)
+        {
+            mensaje = "No hay caja abierta para cerrar.";
+            return;
+        }
+
+        cajaAbierta.monto_cierre = montoCierre;
+        cajaAbierta.fecha_cierre = DateTime.Now;
+        cajaAbierta.diferencia = montoCierre - TotalEsperado;
+        cajaAbierta.estado = "CERRADA";
+
+        Context.Caja.Update(cajaAbierta);
+        await Context.SaveChangesAsync();
+
+        mensaje = "Caja cerrada correctamente.";
+        cajaAbierta = null;
+
+        await CargarDatos();
+    }
+}

@@ -1,0 +1,93 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = FerreteriaWeb
+build_property.RootNamespace = FerreteriaWeb
+build_property.ProjectDir = C:\Users\CARLOS BAEZ\source\repos\FerreteriaWeb\FerreteriaWeb\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\CARLOS BAEZ\source\repos\FerreteriaWeb\FerreteriaWeb
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 6.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Caja.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FqYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Clientes.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2xpZW50ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Facturacion.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmFjdHVyYWNpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/FetchData.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmV0Y2hEYXRhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Inventario.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW52ZW50YXJpby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/KardexView.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2FyZGV4Vmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/ReportesVentas.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0ZXNWZW50YXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-wqlbq93uqf
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-kxfdb8wekg
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/CARLOS BAEZ/source/repos/FerreteriaWeb/FerreteriaWeb/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

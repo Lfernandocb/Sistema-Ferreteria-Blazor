@@ -1,0 +1,81 @@
+﻿@page "/"
+@using FerreteriaWeb.Data
+@inject AuthService AuthService
+@inject NavigationManager Nav
+
+<PageTitle>Inicio - Sistema Ferretero</PageTitle>
+
+<div class="container mt-4">
+    @if (AuthService.UsuarioActual == null)
+    {
+        @* Vista para usuarios no logueados *@
+        <div class="jumbotron p-5 mb-4 bg-light rounded-3 shadow-sm border text-center">
+            <h1 class="display-5 fw-bold text-primary">Sistema de Gestión de Inventario</h1>
+            <p class="fs-4 text-muted">Bienvenido. Por favor, acceda al sistema para gestionar la ferretería.</p>
+            <hr class="my-4">
+            <button class="btn btn-primary btn-lg" @onclick='() => Nav.NavigateTo("login")'>
+                Iniciar Sesión Ahora
+            </button>
+        </div>
+    }
+    else
+    {
+        @* Encabezado de bienvenida con traducción de roles para la interfaz *@
+        <div class="jumbotron p-5 mb-4 bg-light rounded-3 shadow-sm border">
+            <div class="container-fluid py-2">
+                <h1 class="display-5 fw-bold text-primary">Sistema de Gestión de Inventario</h1>
+                <p class="col-md-8 fs-4 text-muted">Bienvenido de nuevo, <strong>@AuthService.UsuarioActual.nombre_login</strong>.</p>
+                <hr class="my-4">
+                <p>
+                    Has iniciado sesión como:
+                    <span class="badge bg-dark">
+                        @(AuthService.UsuarioActual.rol == "VENDEDOR" ? "Agente de Ventas" :
+                                            AuthService.UsuarioActual.rol == "CAJERO" ? "Gestor de Inventario" : "Administrador")
+                </span>
+            </p>
+        </div>
+    </div>
+
+        <div class="row g-4">
+            @* Tarjeta de Facturación - Visible para ADMINISTRADOR y VENDEDOR *@
+        @if (AuthService.UsuarioActual.rol.Equals("ADMINISTRADOR", StringComparison.OrdinalIgnoreCase) ||
+                AuthService.UsuarioActual.rol.Equals("VENDEDOR", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 border-primary shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Facturación</h5>
+                            <p class="card-text text-muted">Realice ventas y genere comprobantes.</p>
+                            <a href="facturacion" class="btn btn-outline-primary">Ir a Ventas</a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* Tarjetas de Inventario y Kardex - Visibles para ADMINISTRADOR y CAJERO (Gestor) *@
+            @if (AuthService.UsuarioActual.rol.Equals("ADMINISTRADOR", StringComparison.OrdinalIgnoreCase) ||
+                    AuthService.UsuarioActual.rol.Equals("CAJERO", StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 border-success shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Inventario</h5>
+                            <p class="card-text text-muted">Gestione el stock de productos.</p>
+                            <a href="inventario" class="btn btn-outline-success">Ver Productos</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-info shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Kardex</h5>
+                            <p class="card-text text-muted">Rastree entradas y salidas.</p>
+                            <a href="kardex" class="btn btn-outline-info">Ver Historial</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

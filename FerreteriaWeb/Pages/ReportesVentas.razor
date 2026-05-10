@@ -1,0 +1,206 @@
+﻿@page "/reportes"
+@using FerreteriaWeb.Data
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Context
+
+<h3 class="mb-4">📈 Reportes de Ventas</h3>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-warning">
+        @error
+    </div>
+}
+else if (cargando)
+{
+    <div class="alert alert-info">
+        Cargando reportes...
+    </div>
+}
+else
+{
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <h6>Total Facturado</h6>
+                    <h3>NIO @TotalFacturado.ToString("0.00")</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <h6>Cantidad de Ventas</h6>
+                    <h3>@CantidadVentas</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark shadow-sm">
+                <div class="card-body">
+                    <h6>IVA Recaudado</h6>
+                    <h3>NIO @IVARecaudado.ToString("0.00")</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-dark text-white shadow-sm">
+                <div class="card-body">
+                    <h6>Promedio por Venta</h6>
+                    <h3>NIO @PromedioVenta.ToString("0.00")</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            Filtros de búsqueda
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-8">
+                    <input class="form-control"
+                           placeholder="Buscar por cliente, RUC/Cédula o tipo de venta..."
+                           @bind="busqueda"
+                           @bind:event="oninput" />
+                </div>
+
+                <div class="col-md-4">
+                    <button class="btn btn-secondary w-100" @onclick="LimpiarBusqueda">
+                        Limpiar búsqueda
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @if (!VentasFiltradas.Any())
+    {
+        <div class="alert alert-info">
+            No hay ventas registradas o no hay resultados para la búsqueda.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID Venta</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>RUC / Cédula</th>
+                    <th>Tipo</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var venta in VentasFiltradas)
+                {
+                    <tr>
+                        <td>@venta.IdVenta</td>
+                        <td>@venta.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@venta.Cliente</td>
+                        <td>@venta.RucCedula</td>
+                        <td>
+                            <span class="badge bg-info text-dark">
+                                @venta.TipoVenta
+                            </span>
+                        </td>
+                        <td>
+                            <strong>NIO @venta.Total.ToString("0.00")</strong>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private bool cargando = true;
+    private string error = "";
+    private string busqueda = "";
+
+    private List<ReporteVentaItem> ventas = new();
+
+    private IEnumerable<ReporteVentaItem> VentasFiltradas =>
+        string.IsNullOrWhiteSpace(busqueda)
+            ? ventas
+            : ventas.Where(v =>
+                v.Cliente.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+                v.RucCedula.Contains(busqueda, StringComparison.OrdinalIgnoreCase) ||
+                v.TipoVenta.Contains(busqueda, StringComparison.OrdinalIgnoreCase));
+
+    private decimal TotalFacturado => VentasFiltradas.Sum(v => v.Total);
+
+    private int CantidadVentas => VentasFiltradas.Count();
+
+    private decimal IVARecaudado => TotalFacturado - (TotalFacturado / 1.15m);
+
+    private decimal PromedioVenta =>
+        CantidadVentas == 0 ? 0 : TotalFacturado / CantidadVentas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            cargando = true;
+
+            var facturas = await Context.Facturas
+                .OrderByDescending(f => f.fecha)
+                .ToListAsync();
+
+            var clientes = await Context.Clientes
+                .ToListAsync();
+
+            ventas = facturas.Select(f =>
+            {
+                var cliente = clientes.FirstOrDefault(c => c.id_cliente == f.cliente_id);
+
+                return new ReporteVentaItem
+                {
+                    IdVenta = f.id_factura,
+                    Fecha = f.fecha,
+                    Cliente = cliente?.nombre_cliente ?? $"Cliente #{f.cliente_id}",
+                    RucCedula = cliente?.ruc_cedula ?? "N/A",
+                    TipoVenta = f.tipo_venta,
+                    Total = f.total
+                };
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            error = "Error al cargar reportes: " + (ex.InnerException?.Message ?? ex.Message);
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private void LimpiarBusqueda()
+    {
+        busqueda = "";
+    }
+
+    private class ReporteVentaItem
+    {
+        public int IdVenta { get; set; }
+        public DateTime Fecha { get; set; }
+        public string Cliente { get; set; } = "";
+        public string RucCedula { get; set; } = "";
+        public string TipoVenta { get; set; } = "";
+        public decimal Total { get; set; }
+    }
+}

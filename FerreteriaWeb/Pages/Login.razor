@@ -1,0 +1,67 @@
+﻿@page "/login"
+@using FerreteriaWeb.Data
+@inject AuthService AuthService
+@inject NavigationManager Nav
+
+<div class="container d-flex justify-content-center align-items-center" style="height: 70vh;">
+    <div class="card shadow-lg border-0" style="width: 380px;">
+        <div class="card-header bg-dark text-white text-center py-3">
+            <h5 class="mb-0">Control de Acceso</h5>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted text-center small mb-4">Ingrese sus credenciales para gestionar la ferretería</p>
+
+            <div class="mb-3">
+                <label class="form-label font-weight-bold">Usuario</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><span class="oi oi-person"></span></span>
+                    <input type="text" class="form-control" @bind="username" placeholder="Usuario de red" />
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label font-weight-bold">Contraseña</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><span class="oi oi-lock-locked"></span></span>
+                    <input type="password" class="form-control" @bind="password" placeholder="********" />
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger py-2 text-center" style="font-size: 0.85rem;">
+                    @error
+                </div>
+            }
+
+            <button class="btn btn-dark w-100 py-2 mb-2" @onclick="HandleLogin">
+                Iniciar Sesión
+            </button>
+        </div>
+        <div class="card-footer text-center py-2 bg-light">
+            <small class="text-muted">Sistema de Gestión de Inventario v1.0</small>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string username = "";
+    private string password = "";
+    private string error = "";
+
+    private async Task HandleLogin()
+    {
+        error = "";
+
+        var exito = await AuthService.Login(username, password);
+
+        if (exito)
+        {
+            Nav.NavigateTo("/");
+        }
+        else
+        {
+            error = "Acceso denegado. Verifique usuario y clave.";
+        }
+    }
+}

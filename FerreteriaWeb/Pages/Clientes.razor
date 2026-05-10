@@ -1,0 +1,45 @@
+﻿@page "/clientes"
+@using FerreteriaWeb.Data
+@inject AppDbContext Context
+
+<div class="container mt-4">
+    <h3 class="text-primary"><i class="oi oi-people"></i> Lista de Clientes</h3>
+
+    <div class="card shadow-sm mt-3">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre / Negocio</th>
+                    <th>RUC / Cédula</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in ListaClientes)
+                {
+                    <tr>
+                        <td>@c.id_cliente</td>
+                        <td>@c.nombre_cliente</td>
+                        <td>@c.ruc_cedula</td>
+                        <td>
+                            <span class="badge @(c.es_mayorista ? "bg-info" : "bg-secondary")">
+                                @(c.es_mayorista ? "Mayorista" : "Minorista")
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private List<Cliente> ListaClientes = new();
+
+    protected override void OnInitialized()
+    {
+        // Esto trae los datos directo de tu tabla 'Clientes' en SQL
+        ListaClientes = Context.Clientes.ToList();
+    }
+}

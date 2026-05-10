@@ -1,0 +1,43 @@
+﻿@inherits LayoutComponentBase
+@using FerreteriaWeb.Data
+@inject AuthService AuthService
+@implements IDisposable
+
+<PageTitle>Sistema Ferretero</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4 d-flex justify-content-between align-items-center">
+            @if (AuthService.UsuarioActual != null)
+            {
+                <span class="text-muted small">
+                    <i class="oi oi-person"></i> Sesión activa: <strong>@AuthService.UsuarioActual.nombre_login</strong>
+                </span>
+            }
+            <span class="text-primary fw-bold">Ferretería Profesional</span>
+        </div>
+
+        <article class="content px-4">
+            @* EL BODY ES LO QUE MUESTRA TUS MÓDULOS *@
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Esto obliga al Layout a refrescarse cuando el AuthService cambia
+        AuthService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        // Limpieza para evitar que la memoria se llene
+        AuthService.OnChange -= StateHasChanged;
+    }
+}
