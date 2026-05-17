@@ -1,1 +1,449 @@
 
+USE [master]
+GO
+/****** Object:  Database [FerreteriaDB]    Script Date: 16/5/2026 10:29:47 ******/
+CREATE DATABASE [FerreteriaDB]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'FerreteriaDB', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\FerreteriaDB.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'FerreteriaDB_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\FerreteriaDB_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
+GO
+ALTER DATABASE [FerreteriaDB] SET COMPATIBILITY_LEVEL = 160
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [FerreteriaDB].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [FerreteriaDB] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [FerreteriaDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [FerreteriaDB] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET  ENABLE_BROKER 
+GO
+ALTER DATABASE [FerreteriaDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [FerreteriaDB] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET RECOVERY FULL 
+GO
+ALTER DATABASE [FerreteriaDB] SET  MULTI_USER 
+GO
+ALTER DATABASE [FerreteriaDB] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [FerreteriaDB] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [FerreteriaDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [FerreteriaDB] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [FerreteriaDB] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [FerreteriaDB] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'FerreteriaDB', N'ON'
+GO
+ALTER DATABASE [FerreteriaDB] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [FerreteriaDB] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [FerreteriaDB]
+GO
+/****** Object:  Table [dbo].[Caja]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Caja](
+	[id_caja] [int] IDENTITY(1,1) NOT NULL,
+	[usuario_id] [int] NULL,
+	[monto_apertura] [decimal](18, 2) NOT NULL,
+	[monto_cierre] [decimal](18, 2) NULL,
+	[fecha_apertura] [datetime] NULL,
+	[estado] [varchar](10) NULL,
+	[fecha_cierre] [datetime] NULL,
+	[diferencia] [decimal](18, 2) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_caja] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Categorias]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Categorias](
+	[id_categoria] [int] IDENTITY(1,1) NOT NULL,
+	[nombre_cat] [varchar](50) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_categoria] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Clientes]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Clientes](
+	[id_cliente] [int] IDENTITY(1,1) NOT NULL,
+	[nombre_cliente] [varchar](150) NOT NULL,
+	[ruc_cedula] [varchar](20) NULL,
+	[es_mayorista] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_cliente] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Creditos]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Creditos](
+	[id_credito] [int] IDENTITY(1,1) NOT NULL,
+	[cliente_id] [int] NULL,
+	[limite_credito] [decimal](18, 2) NULL,
+	[saldo_pendiente] [decimal](18, 2) NULL,
+	[estado_morosidad] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_credito] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Detalle_Ventas]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Detalle_Ventas](
+	[id_detalle] [int] IDENTITY(1,1) NOT NULL,
+	[venta_id] [int] NULL,
+	[producto_id] [int] NULL,
+	[cantidad] [decimal](18, 2) NOT NULL,
+	[precio_unitario] [decimal](18, 2) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_detalle] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[FacturaDetalles]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[FacturaDetalles](
+	[id_detalle] [int] IDENTITY(1,1) NOT NULL,
+	[factura_id] [int] NULL,
+	[producto_id] [int] NULL,
+	[cantidad] [int] NULL,
+	[precio_unitario] [decimal](18, 2) NULL,
+	[subtotal]  AS ([cantidad]*[precio_unitario]),
+PRIMARY KEY CLUSTERED 
+(
+	[id_detalle] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Facturas]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Facturas](
+	[id_factura] [int] IDENTITY(1,1) NOT NULL,
+	[fecha] [datetime] NULL,
+	[cliente] [nvarchar](100) NULL,
+	[total] [decimal](18, 2) NULL,
+	[estado] [nvarchar](20) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_factura] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Kardex]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Kardex](
+	[id_kardex] [int] IDENTITY(1,1) NOT NULL,
+	[producto_id] [int] NULL,
+	[tipo_movimiento] [varchar](10) NULL,
+	[cantidad] [decimal](18, 2) NOT NULL,
+	[saldo_post_mov] [decimal](18, 2) NULL,
+	[fecha] [datetime] NULL,
+	[detalle] [nvarchar](max) NULL,
+	[fecha_registro] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_kardex] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Productos]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Productos](
+	[id_producto] [int] IDENTITY(1,1) NOT NULL,
+	[nombre] [varchar](150) NOT NULL,
+	[categoria_id] [int] NULL,
+	[unidad_id] [int] NULL,
+	[precio_compra] [decimal](18, 2) NOT NULL,
+	[precio_venta] [decimal](18, 2) NOT NULL,
+	[stock_real] [decimal](18, 2) NULL,
+	[stock_minimo] [decimal](18, 2) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_producto] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Proveedores]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Proveedores](
+	[id_proveedor] [int] IDENTITY(1,1) NOT NULL,
+	[nombre_empresa] [varchar](150) NOT NULL,
+	[telefono] [varchar](20) NULL,
+	[direccion] [text] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_proveedor] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Unidades_Medida]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Unidades_Medida](
+	[id_unidad] [int] IDENTITY(1,1) NOT NULL,
+	[descripcion] [varchar](20) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_unidad] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Usuarios]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Usuarios](
+	[id_usuario] [int] IDENTITY(1,1) NOT NULL,
+	[rol] [varchar](20) NULL,
+	[usuario] [nvarchar](50) NULL,
+	[clave] [nvarchar](50) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_usuario] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Ventas]    Script Date: 16/5/2026 10:29:47 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Ventas](
+	[id_venta] [int] IDENTITY(1,1) NOT NULL,
+	[fecha] [datetime] NOT NULL,
+	[cliente_nombre] [nvarchar](250) NULL,
+	[total] [decimal](18, 2) NULL,
+	[cliente] [nvarchar](250) NULL,
+	[cliente_id] [int] NULL,
+	[usuario_id] [int] NULL,
+	[tipo_venta] [varchar](10) NULL,
+	[total_venta] [decimal](18, 2) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[id_venta] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET IDENTITY_INSERT [dbo].[Caja] ON 
+
+INSERT [dbo].[Caja] ([id_caja], [usuario_id], [monto_apertura], [monto_cierre], [fecha_apertura], [estado], [fecha_cierre], [diferencia]) VALUES (1, 29, CAST(2000.00 AS Decimal(18, 2)), CAST(2517.50 AS Decimal(18, 2)), CAST(N'2026-05-10T02:52:26.907' AS DateTime), N'CERRADA', CAST(N'2026-05-10T02:53:55.480' AS DateTime), CAST(0.00 AS Decimal(18, 2)))
+SET IDENTITY_INSERT [dbo].[Caja] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Categorias] ON 
+
+INSERT [dbo].[Categorias] ([id_categoria], [nombre_cat]) VALUES (1, N'Herramientas Manuales')
+INSERT [dbo].[Categorias] ([id_categoria], [nombre_cat]) VALUES (2, N'Materiales Eléctricos')
+INSERT [dbo].[Categorias] ([id_categoria], [nombre_cat]) VALUES (3, N'Fontanería')
+SET IDENTITY_INSERT [dbo].[Categorias] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Clientes] ON 
+
+INSERT [dbo].[Clientes] ([id_cliente], [nombre_cliente], [ruc_cedula], [es_mayorista]) VALUES (1, N'Consumidor Final', N'000-000000-0000', 0)
+INSERT [dbo].[Clientes] ([id_cliente], [nombre_cliente], [ruc_cedula], [es_mayorista]) VALUES (2, N'E. Soluciones Automaticas', N'J0310000244480', 0)
+SET IDENTITY_INSERT [dbo].[Clientes] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Detalle_Ventas] ON 
+
+INSERT [dbo].[Detalle_Ventas] ([id_detalle], [venta_id], [producto_id], [cantidad], [precio_unitario]) VALUES (1, 8, 2, CAST(1.00 AS Decimal(18, 2)), CAST(450.00 AS Decimal(18, 2)))
+INSERT [dbo].[Detalle_Ventas] ([id_detalle], [venta_id], [producto_id], [cantidad], [precio_unitario]) VALUES (2, 8, 3, CAST(1.00 AS Decimal(18, 2)), CAST(90.00 AS Decimal(18, 2)))
+INSERT [dbo].[Detalle_Ventas] ([id_detalle], [venta_id], [producto_id], [cantidad], [precio_unitario]) VALUES (3, 9, 2, CAST(1.00 AS Decimal(18, 2)), CAST(450.00 AS Decimal(18, 2)))
+INSERT [dbo].[Detalle_Ventas] ([id_detalle], [venta_id], [producto_id], [cantidad], [precio_unitario]) VALUES (4, 9, 3, CAST(1.00 AS Decimal(18, 2)), CAST(90.00 AS Decimal(18, 2)))
+INSERT [dbo].[Detalle_Ventas] ([id_detalle], [venta_id], [producto_id], [cantidad], [precio_unitario]) VALUES (5, 10, 2, CAST(1.00 AS Decimal(18, 2)), CAST(450.00 AS Decimal(18, 2)))
+SET IDENTITY_INSERT [dbo].[Detalle_Ventas] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Kardex] ON 
+
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (1, 3, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(199.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:49:20.163' AS DateTime), NULL, CAST(N'2026-05-10T01:49:20.163' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (2, 2, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(49.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:49:20.163' AS DateTime), NULL, CAST(N'2026-05-10T01:49:20.163' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (3, 2, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(49.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:49:20.173' AS DateTime), NULL, CAST(N'2026-05-10T01:49:20.073' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (4, 3, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(199.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:49:20.173' AS DateTime), NULL, CAST(N'2026-05-10T01:49:20.093' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (5, 3, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(198.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:59:49.447' AS DateTime), NULL, CAST(N'2026-05-10T01:59:49.447' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (6, 2, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(48.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:59:49.447' AS DateTime), NULL, CAST(N'2026-05-10T01:59:49.447' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (7, 2, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(48.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:59:49.457' AS DateTime), NULL, CAST(N'2026-05-10T01:59:49.333' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (8, 3, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(198.00 AS Decimal(18, 2)), CAST(N'2026-05-10T01:59:49.457' AS DateTime), NULL, CAST(N'2026-05-10T01:59:49.370' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (9, 2, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(47.00 AS Decimal(18, 2)), CAST(N'2026-05-10T02:53:22.240' AS DateTime), NULL, CAST(N'2026-05-10T02:53:22.240' AS DateTime))
+INSERT [dbo].[Kardex] ([id_kardex], [producto_id], [tipo_movimiento], [cantidad], [saldo_post_mov], [fecha], [detalle], [fecha_registro]) VALUES (10, 2, N'SALIDA', CAST(1.00 AS Decimal(18, 2)), CAST(47.00 AS Decimal(18, 2)), CAST(N'2026-05-10T02:53:22.250' AS DateTime), NULL, CAST(N'2026-05-10T02:53:22.203' AS DateTime))
+SET IDENTITY_INSERT [dbo].[Kardex] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Productos] ON 
+
+INSERT [dbo].[Productos] ([id_producto], [nombre], [categoria_id], [unidad_id], [precio_compra], [precio_venta], [stock_real], [stock_minimo]) VALUES (2, N'Multimetro', 1, 1, CAST(10.50 AS Decimal(18, 2)), CAST(450.00 AS Decimal(18, 2)), CAST(47.00 AS Decimal(18, 2)), CAST(1.00 AS Decimal(18, 2)))
+INSERT [dbo].[Productos] ([id_producto], [nombre], [categoria_id], [unidad_id], [precio_compra], [precio_venta], [stock_real], [stock_minimo]) VALUES (3, N'cinta negra aislate 3m', 1, 1, CAST(0.00 AS Decimal(18, 2)), CAST(90.00 AS Decimal(18, 2)), CAST(198.00 AS Decimal(18, 2)), CAST(1.00 AS Decimal(18, 2)))
+INSERT [dbo].[Productos] ([id_producto], [nombre], [categoria_id], [unidad_id], [precio_compra], [precio_venta], [stock_real], [stock_minimo]) VALUES (9, N'Cinta Metrica Truper 5M', 1, 1, CAST(0.00 AS Decimal(18, 2)), CAST(250.00 AS Decimal(18, 2)), CAST(10.00 AS Decimal(18, 2)), CAST(1.00 AS Decimal(18, 2)))
+SET IDENTITY_INSERT [dbo].[Productos] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Unidades_Medida] ON 
+
+INSERT [dbo].[Unidades_Medida] ([id_unidad], [descripcion]) VALUES (1, N'Unidad')
+INSERT [dbo].[Unidades_Medida] ([id_unidad], [descripcion]) VALUES (2, N'Metro')
+INSERT [dbo].[Unidades_Medida] ([id_unidad], [descripcion]) VALUES (3, N'Kilogramo')
+SET IDENTITY_INSERT [dbo].[Unidades_Medida] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Usuarios] ON 
+
+INSERT [dbo].[Usuarios] ([id_usuario], [rol], [usuario], [clave]) VALUES (29, N'ADMINISTRADOR', N'admin', N'admin123')
+INSERT [dbo].[Usuarios] ([id_usuario], [rol], [usuario], [clave]) VALUES (30, N'VENDEDOR', N'vendedor', N'vendedor123')
+INSERT [dbo].[Usuarios] ([id_usuario], [rol], [usuario], [clave]) VALUES (31, N'CAJERO', N'bodeguero', N'bodeguero123')
+SET IDENTITY_INSERT [dbo].[Usuarios] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Ventas] ON 
+
+INSERT [dbo].[Ventas] ([id_venta], [fecha], [cliente_nombre], [total], [cliente], [cliente_id], [usuario_id], [tipo_venta], [total_venta]) VALUES (1, CAST(N'2026-05-09T17:55:39.660' AS DateTime), N'Cliente Inicial de Prueba', CAST(1250.50 AS Decimal(18, 2)), NULL, 1, 1, N'CONTADO', CAST(0.00 AS Decimal(18, 2)))
+INSERT [dbo].[Ventas] ([id_venta], [fecha], [cliente_nombre], [total], [cliente], [cliente_id], [usuario_id], [tipo_venta], [total_venta]) VALUES (8, CAST(N'2026-05-10T01:49:19.727' AS DateTime), NULL, NULL, NULL, 1, 29, N'CONTADO', CAST(621.00 AS Decimal(18, 2)))
+INSERT [dbo].[Ventas] ([id_venta], [fecha], [cliente_nombre], [total], [cliente], [cliente_id], [usuario_id], [tipo_venta], [total_venta]) VALUES (9, CAST(N'2026-05-10T01:59:49.210' AS DateTime), NULL, NULL, NULL, 2, 29, N'CONTADO', CAST(621.00 AS Decimal(18, 2)))
+INSERT [dbo].[Ventas] ([id_venta], [fecha], [cliente_nombre], [total], [cliente], [cliente_id], [usuario_id], [tipo_venta], [total_venta]) VALUES (10, CAST(N'2026-05-10T02:53:22.103' AS DateTime), NULL, NULL, NULL, 2, 29, N'CONTADO', CAST(517.50 AS Decimal(18, 2)))
+SET IDENTITY_INSERT [dbo].[Ventas] OFF
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Clientes__153BBEE08ED3B20D]    Script Date: 16/5/2026 10:29:48 ******/
+ALTER TABLE [dbo].[Clientes] ADD UNIQUE NONCLUSTERED 
+(
+	[ruc_cedula] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ__Creditos__47E34D65E39C9074]    Script Date: 16/5/2026 10:29:48 ******/
+ALTER TABLE [dbo].[Creditos] ADD UNIQUE NONCLUSTERED 
+(
+	[cliente_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[Caja] ADD  DEFAULT (getdate()) FOR [fecha_apertura]
+GO
+ALTER TABLE [dbo].[Caja] ADD  DEFAULT ('ABIERTA') FOR [estado]
+GO
+ALTER TABLE [dbo].[Clientes] ADD  DEFAULT ((0)) FOR [es_mayorista]
+GO
+ALTER TABLE [dbo].[Creditos] ADD  DEFAULT ((50000.00)) FOR [limite_credito]
+GO
+ALTER TABLE [dbo].[Creditos] ADD  DEFAULT ((0)) FOR [saldo_pendiente]
+GO
+ALTER TABLE [dbo].[Creditos] ADD  DEFAULT ((0)) FOR [estado_morosidad]
+GO
+ALTER TABLE [dbo].[Facturas] ADD  DEFAULT (getdate()) FOR [fecha]
+GO
+ALTER TABLE [dbo].[Facturas] ADD  DEFAULT ('Pagada') FOR [estado]
+GO
+ALTER TABLE [dbo].[Kardex] ADD  DEFAULT (getdate()) FOR [fecha]
+GO
+ALTER TABLE [dbo].[Kardex] ADD  DEFAULT (getdate()) FOR [fecha_registro]
+GO
+ALTER TABLE [dbo].[Productos] ADD  DEFAULT ((0)) FOR [stock_real]
+GO
+ALTER TABLE [dbo].[Productos] ADD  DEFAULT ((5)) FOR [stock_minimo]
+GO
+ALTER TABLE [dbo].[Ventas] ADD  DEFAULT (getdate()) FOR [fecha]
+GO
+ALTER TABLE [dbo].[Creditos]  WITH CHECK ADD FOREIGN KEY([cliente_id])
+REFERENCES [dbo].[Clientes] ([id_cliente])
+GO
+ALTER TABLE [dbo].[Detalle_Ventas]  WITH CHECK ADD FOREIGN KEY([producto_id])
+REFERENCES [dbo].[Productos] ([id_producto])
+GO
+ALTER TABLE [dbo].[FacturaDetalles]  WITH CHECK ADD FOREIGN KEY([factura_id])
+REFERENCES [dbo].[Facturas] ([id_factura])
+GO
+ALTER TABLE [dbo].[Kardex]  WITH CHECK ADD FOREIGN KEY([producto_id])
+REFERENCES [dbo].[Productos] ([id_producto])
+GO
+ALTER TABLE [dbo].[Productos]  WITH CHECK ADD FOREIGN KEY([categoria_id])
+REFERENCES [dbo].[Categorias] ([id_categoria])
+GO
+ALTER TABLE [dbo].[Productos]  WITH CHECK ADD FOREIGN KEY([unidad_id])
+REFERENCES [dbo].[Unidades_Medida] ([id_unidad])
+GO
+ALTER TABLE [dbo].[Kardex]  WITH CHECK ADD CHECK  (([tipo_movimiento]='SALIDA' OR [tipo_movimiento]='ENTRADA'))
+GO
+ALTER TABLE [dbo].[Usuarios]  WITH CHECK ADD CHECK  (([rol]='CAJERO' OR [rol]='VENDEDOR' OR [rol]='ADMINISTRADOR'))
+GO
+USE [master]
+GO
+ALTER DATABASE [FerreteriaDB] SET  READ_WRITE 
+GO
